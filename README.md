@@ -16,14 +16,12 @@
 6) Profit?
 
 ### Bugs
-1) The server will crash if an request doesn't have an "Host" header
-2) Parent directory actually goes to root instead of previous folder
+1) Parent directory actually goes to root instead of previous folder
 
 ### TO-DO
 1) Usage of Content-Range for enchance media playback
-2) Logging/Verbose of activity in the server
-3) Virtual Servers
-4) ???
+2) Virtual Servers
+3) ???
 
 ### Third-Party software/code
 - This webserver contains a file called "mimes.json" extracted from [snekfetch](https://github.com/devsnek/snekfetch)
