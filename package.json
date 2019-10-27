@@ -1,0 +1,11 @@
+{
+  "name": "guanaco_webserver",
+  "version": "1.0.2",
+  "description": "Simple Webserver maded in Node.JS",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "PANCHO7532",
+  "license": "MIT"
+}
