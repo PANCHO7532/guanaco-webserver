@@ -19,9 +19,8 @@
 1) Parent directory actually goes to root instead of previous folder
 
 ### TO-DO
-1) Usage of Content-Range for enchance media playback
-2) Virtual Servers
-3) ???
+1) Virtual Servers
+2) ???
 
 ### Third-Party software/code
 - This webserver contains a file called "mimes.json" extracted from [snekfetch](https://github.com/devsnek/snekfetch)
