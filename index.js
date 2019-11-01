@@ -3,6 +3,8 @@
 * This program comes with an LICENSE file that you must read!
 * Copyright (c) 2019 - P7COMunications LLC
 */
+// Note to myself: add comments to review what the fuck i am doing
+// 01/11/2019: 206 Partial Content support added with the help of codeproject.com
 var http = require('http');
 var fs = require('fs');
 var path = require('path');
@@ -10,7 +12,7 @@ var os = require('os');
 var util = require('util'); //for debuggung and all of that things
 var mainPort = 80;
 var webroot = "public_html";
-var server = "Guanaco Webserver/1.2b";
+var server = "Guanaco Webserver/1.7";
 const mime_types = JSON.parse(fs.readFileSync("data/mimes.json"));
 if(process.argv[2] == "-v") {
     var verboose = true;
@@ -44,27 +46,46 @@ function verbooose(req, sc) {
     }
     console.log(parseRemoteAddr(req.connection.remoteAddress) + ":" + req.connection.remotePort + " - " + req.method + " " + req.url +  " " + sc + " - [" + Date() + "] - " + ua);
 }
+var allowed_methods = [
+    "GET"
+];
 http.createServer(function(req, res){
     if(req) {
+        for(c = 0; c < allowed_methods.length; c++) {
+            if(req.method != allowed_methods[c]) {
+                if(verboose == true) {
+                    verbooose(req, 501);
+                }
+                res.writeHead(501, {'Content-Type':'text/html','Content-Length':fs.statSync("data/staticPages/501.html")["size"], "Server":server});
+                var err1 = fs.readFileSync("data/staticPages/501.html").toString();
+                err1 = err1.replace("$serverName$", server);
+                err1 = err1.replace("$ostype$", os.type());
+                err1 = err1.replace("$osrelease$", os.release());
+                err1 = err1.replace("$localaddr$", parseHost(req));
+                err1 = err1.replace("$localport$", req.connection.localPort);
+                res.end(err1);
+                return;
+            }
+        }
         if(req.url == "/sys-bin/folder.png") {
             if(verboose == true) {
                 verbooose(req, 200);
             }
-            res.writeHead(200, {'Content-Type':'image/png', 'Server':server});
+            res.writeHead(200, {'Content-Type':'image/png', 'Content-Length':fs.statSync("data/visualRes/folder.png")["size"], 'Server':server});
             fs.createReadStream("data/visualRes/folder.png").pipe(res);
             return;
         } else if(req.url == "/sys-bin/generic_file.png") {
             if(verboose == true) {
                 verbooose(req, 200);
             }
-            res.writeHead(200, {'Content-Type':'image/png', 'Server':server});
+            res.writeHead(200, {'Content-Type':'image/png', 'Content-Length':fs.statSync("data/visualRes/generic_file.png")["size"], 'Server':server});
             fs.createReadStream("data/visualRes/generic_file.png").pipe(res);
             return;
         } else if(req.url == "/sys-bin/back.png") {
             if(verboose == true) {
                 verbooose(req, 200);
             }
-            res.writeHead(200, {'Content-Type':'image/png', 'Server':server});
+            res.writeHead(200, {'Content-Type':'image/png', 'Content-Length':fs.statSync("data/visualRes/back.png")["size"], 'Server':server});
             fs.createReadStream("data/visualRes/back.png").pipe(res);
             return;
         }
@@ -77,17 +98,65 @@ http.createServer(function(req, res){
                     var mimexd = "application/octet-stream";
                 }
                 if(pa1["base"] < 1) {
-                    if(verboose == true) {
-                        verbooose(req, 200);
+                    if(req.headers["range"]) {
+                        if(verboose == true) {
+                            verbooose(req, 206);
+                        }
+                        var ran_st1 = req.headers["range"].split("-");
+                        if(ran_st1[0] == "") {
+                            var start_range = parseInt(ran_st1[1]);
+                            var bln1 = true;
+                        } else {
+                            var start_range = parseInt(ran_st1[0].substring(6, ran_st1[0].length));
+                        }
+                        if(ran_st1[1] == "") {
+                            var final_range = fs.statSync(webroot + pa1["dir"] + pa1["base"])["size"];
+                        } else {
+                            if(bln1 == true) {
+                                var final_range = fs.statSync(webroot + pa1["dir"] + pa1["base"])["size"];
+                            }
+                            var final_range = parseInt(ran_st1[1]);
+                        }
+                        var cl = final_range - start_range + 1;
+                        res.writeHead(206, {'Content-Type':mimexd, "Accept-Ranges": "bytes", "Content-Range":"bytes=" + start_range + "-" + final_range + "/" + fs.statSync(webroot + pa1["dir"] + pa1["base"])["size"], "Content-Length": cl, "Server":server});
+                        fs.createReadStream(webroot + pa1["dir"] + pa1["base"], {start: start_range, end: final_range}).pipe(res);
+                    } else {
+                        if(verboose == true) {
+                            verbooose(req, 200);
+                        }
+                        res.writeHead(200, {'Content-Type':mimexd, "Accept-Ranges": "bytes", "Content-Length":fs.statSync(webroot + pa1["dir"] + pa1["base"])["size"], "Server":server});
+                        fs.createReadStream(webroot + pa1["dir"] + pa1["base"]).pipe(res);
                     }
-                    res.writeHead(200, {'Content-Type':mimexd, "Content-Length":fs.statSync(webroot + pa1["dir"] + pa1["base"])["size"], "Server":server});
-                    fs.createReadStream(webroot + pa1["dir"] + pa1["base"]).pipe(res);
                 } else {
-                    if(verboose == true) {
-                        verbooose(req, 200);
+                    if(req.headers["range"]) {
+                        if(verboose == true) {
+                            verbooose(req, 206);
+                        }
+                        var ran_st1 = req.headers["range"].split("-");
+                        if(ran_st1[0] == "") {
+                            var start_range = parseInt(ran_st1[1]);
+                            var bln1 = true;
+                        } else {
+                            var start_range = parseInt(ran_st1[0].substring(6, ran_st1[0].length));
+                        }
+                        if(ran_st1[1] == "") {
+                            var final_range = fs.statSync(webroot + pa1["dir"] + "/" + pa1["base"])["size"];
+                        } else {
+                            if(bln1 == true) {
+                                var final_range = fs.statSync(webroot + pa1["dir"] + "/" + pa1["base"])["size"];
+                            }
+                            var final_range = parseInt(ran_st1[1]);
+                        }
+                        var cl = final_range - start_range + 1;
+                        res.writeHead(206, {'Content-Type':mimexd, "Accept-Ranges": "bytes", "Content-Range":"bytes=" + start_range + "-" + final_range + "/" + fs.statSync(webroot + pa1["dir"] + "/" + pa1["base"])["size"], "Content-Length": cl, "Server":server});
+                        fs.createReadStream(webroot + pa1["dir"] + "/" + pa1["base"], {start: start_range, end: final_range}).pipe(res);
+                    } else {
+                        if(verboose == true) {
+                            verbooose(req, 200);
+                        }
+                        res.writeHead(200, {'Content-Type':mimexd, "Accept-Ranges": "bytes", "Content-Length":fs.statSync(webroot + pa1["dir"] + "/" + pa1["base"])["size"], "Server":server});
+                        fs.createReadStream(webroot + pa1["dir"] + "/" + pa1["base"]).pipe(res);
                     }
-                    res.writeHead(200, {'Content-Type':mimexd, "Content-Length":fs.statSync(webroot + pa1["dir"] + "/" + pa1["base"])["size"], "Server":server});
-                    fs.createReadStream(webroot + pa1["dir"] + "/" + pa1["base"]).pipe(res);
                 }
                 return;
             } else {
@@ -158,17 +227,65 @@ http.createServer(function(req, res){
                     var mimexd = "application/octet-stream";
                 }
                 if(pa1["base"] < 1) {
-                    if(verboose == true) {
-                        verbooose(req, 200);
+                    if(req.headers["range"]) {
+                        if(verboose == true) {
+                            verbooose(req, 206);
+                        }
+                        var ran_st1 = req.headers["range"].split("-");
+                        if(ran_st1[0] == "") {
+                            var start_range = parseInt(ran_st1[1]);
+                            var bln1 = true;
+                        } else {
+                            var start_range = parseInt(ran_st1[0].substring(6, ran_st1[0].length));
+                        }
+                        if(ran_st1[1] == "") {
+                            var final_range = fs.statSync(webroot + pa1["dir"] + pa1["base"])["size"];
+                        } else {
+                            if(bln1 == true) {
+                                var final_range = fs.statSync(webroot + pa1["dir"] + pa1["base"])["size"];
+                            }
+                            var final_range = parseInt(ran_st1[1]);
+                        }
+                        var cl = final_range - start_range + 1;
+                        res.writeHead(206, {'Content-Type':mimexd, "Accept-Ranges": "bytes", "Content-Range":"bytes=" + start_range + "-" + final_range + "/" + fs.statSync(webroot + pa1["dir"] + pa1["base"])["size"], "Content-Length": cl, "Server":server});
+                        fs.createReadStream(webroot + pa1["dir"] + pa1["base"], {start: start_range, end: final_range}).pipe(res);
+                    } else {
+                        if(verboose == true) {
+                            verbooose(req, 200);
+                        }
+                        res.writeHead(200, {'Content-Type':mimexd, "Accept-Ranges": "bytes", "Content-Length":fs.statSync(webroot + pa1["dir"] + pa1["base"])["size"], "Server":server});
+                        fs.createReadStream(webroot + pa1["dir"] + pa1["base"]).pipe(res);
                     }
-                    res.writeHead(200, {'Content-Type':mimexd, "Content-Length":fs.statSync(webroot + pa1["dir"] + pa1["base"])["size"], "Server":server});
-                    fs.createReadStream(webroot + pa1["dir"] + pa1["base"]).pipe(res);
                 } else {
-                    if(verboose == true) {
-                        verbooose(req, 200);
+                    if(req.headers["range"]) {
+                        if(verboose == true) {
+                            verbooose(req, 206);
+                        }
+                        var ran_st1 = req.headers["range"].split("-");
+                        if(ran_st1[0] == "") {
+                            var start_range = parseInt(ran_st1[1]);
+                            var bln1 = true;
+                        } else {
+                            var start_range = parseInt(ran_st1[0].substring(6, ran_st1[0].length));
+                        }
+                        if(ran_st1[1] == "") {
+                            var final_range = fs.statSync(webroot + pa1["dir"] + "/" + pa1["base"])["size"];
+                        } else {
+                            if(bln1 == true) {
+                                var final_range = fs.statSync(webroot + pa1["dir"] + "/" + pa1["base"])["size"];
+                            }
+                            var final_range = parseInt(ran_st1[1]);
+                        }
+                        var cl = final_range - start_range + 1;
+                        res.writeHead(206, {'Content-Type':mimexd, "Accept-Ranges": "bytes", "Content-Range":"bytes=" + start_range + "-" + final_range + "/" + fs.statSync(webroot + pa1["dir"] + "/" + pa1["base"])["size"], "Content-Length": cl, "Server":server});
+                        fs.createReadStream(webroot + pa1["dir"] + "/" + pa1["base"], {start: start_range, end: final_range}).pipe(res);
+                    } else {
+                        if(verboose == true) {
+                            verbooose(req, 200);
+                        }
+                        res.writeHead(200, {'Content-Type':mimexd, "Accept-Ranges": "bytes", "Content-Length":fs.statSync(webroot + pa1["dir"] + "/" + pa1["base"])["size"], "Server":server});
+                        fs.createReadStream(webroot + pa1["dir"] + "/" + pa1["base"]).pipe(res);
                     }
-                    res.writeHead(200, {'Content-Type':mimexd, "Content-Length":fs.statSync(webroot + pa1["dir"] + "/" + pa1["base"])["size"], "Server":server});
-                    fs.createReadStream(webroot + pa1["dir"] + "/" + pa1["base"]).pipe(res);
                 }
                 return;
             } else {
@@ -232,11 +349,20 @@ http.createServer(function(req, res){
                 }
             }
         } else {
-            var sr1 = "";
+            //var sr1 = "";
+            var sr1 = fs.readFileSync("data/staticPages/404.html").toString();
+            //take this on count: <i>$serverName$ ($ostype$ $osrelease$) Server at $localaddr$ Port $localport$</i>
+            sr1 = sr1.replace("$serverName$", server);
+            sr1 = sr1.replace("$ostype$", os.type());
+            sr1 = sr1.replace("$osrelease$", os.release());
+            sr1 = sr1.replace("$localaddr$", parseHost(req));
+            sr1 = sr1.replace("$localport$", req.connection.localPort);
+            /*
             sr1 += "<!DOCTYPE HTML>\r\n<html>\r\n<head>\r\n<title>404 Not Found</title>\r\n</head>\r\n<body>\r\n<h1>404 Not Found</h1>\r\n";
             sr1 += "<p>The requested resource can't be found</p>\r\n<hr>\r\n";
             sr1 += "<i>" + server + " (" + os.type() +  " " + os.release() + ") at " + parseHost(req) + " Port " + req.connection.localPort + "</i>\r\n";
             sr1 += "</body>\r\n</html>";
+            */
             if(verboose == true) {
                 verbooose(req, 404);
             }
@@ -247,4 +373,4 @@ http.createServer(function(req, res){
         }
     }
 }).listen(mainPort);
-console.log("[INFO] - Server started!");
+console.log("[INFO] - Server started on port: " + mainPort);
