@@ -12,7 +12,7 @@ var os = require('os');
 var util = require('util'); //for debuggung and all of that things
 var mainPort = 80;
 var webroot = "public_html";
-var server = "Guanaco Webserver/1.7";
+var server = "Guanaco Webserver/1.7.2";
 const mime_types = JSON.parse(fs.readFileSync("data/mimes.json"));
 if(process.argv[2] == "-v") {
     var verboose = true;
@@ -99,9 +99,6 @@ http.createServer(function(req, res){
                 }
                 if(pa1["base"] < 1) {
                     if(req.headers["range"]) {
-                        if(verboose == true) {
-                            verbooose(req, 206);
-                        }
                         var ran_st1 = req.headers["range"].split("-");
                         if(ran_st1[0] == "") {
                             var start_range = parseInt(ran_st1[1]);
@@ -118,6 +115,36 @@ http.createServer(function(req, res){
                             var final_range = parseInt(ran_st1[1]);
                         }
                         var cl = final_range - start_range + 1;
+                        if(start_range > fs.statSync(webroot + pa1["dir"] + pa1["base"])["size"]) {
+                            var sr2 = fs.readFileSync("staticPages/416.html");
+                            sr2 = sr2.replace("$serverName$", server);
+                            sr2 = sr2.replace("$ostype$", os.type());
+                            sr2 = sr2.replace("$osrelease$", os.release());
+                            sr2 = sr2.replace("$localaddr$", parseHost(req));
+                            sr2 = sr2.replace("$localport$", req.connection.localPort);
+                            if(verboose == true) {
+                                verbooose(req, 416);
+                            }
+                            res.writeHead(416, {'Content-Type':'text/html', 'Content-Length': sr2.length, "Server":server});
+                            res.end(sr2);
+                            return;
+                        } else if(final_range > fs.statSync(webroot + pa1["dir"] + pa1["base"])["size"]) {
+                            var sr2 = fs.readFileSync("staticPages/416.html");
+                            sr2 = sr2.replace("$serverName$", server);
+                            sr2 = sr2.replace("$ostype$", os.type());
+                            sr2 = sr2.replace("$osrelease$", os.release());
+                            sr2 = sr2.replace("$localaddr$", parseHost(req));
+                            sr2 = sr2.replace("$localport$", req.connection.localPort);
+                            if(verboose == true) {
+                                verbooose(req, 416);
+                            }
+                            res.writeHead(416, {'Content-Type':'text/html', 'Content-Length': sr2.length, "Server":server});
+                            res.end(sr2);
+                            return;
+                        }
+                        if(verboose == true) {
+                            verbooose(req, 206);
+                        }
                         res.writeHead(206, {'Content-Type':mimexd, "Accept-Ranges": "bytes", "Content-Range":"bytes=" + start_range + "-" + final_range + "/" + fs.statSync(webroot + pa1["dir"] + pa1["base"])["size"], "Content-Length": cl, "Server":server});
                         fs.createReadStream(webroot + pa1["dir"] + pa1["base"], {start: start_range, end: final_range}).pipe(res);
                     } else {
@@ -129,9 +156,6 @@ http.createServer(function(req, res){
                     }
                 } else {
                     if(req.headers["range"]) {
-                        if(verboose == true) {
-                            verbooose(req, 206);
-                        }
                         var ran_st1 = req.headers["range"].split("-");
                         if(ran_st1[0] == "") {
                             var start_range = parseInt(ran_st1[1]);
@@ -148,6 +172,36 @@ http.createServer(function(req, res){
                             var final_range = parseInt(ran_st1[1]);
                         }
                         var cl = final_range - start_range + 1;
+                        if(start_range > fs.statSync(webroot + pa1["dir"] + "/" + pa1["base"])["size"]) {
+                            var sr2 = fs.readFileSync("staticPages/416.html");
+                            sr2 = sr2.replace("$serverName$", server);
+                            sr2 = sr2.replace("$ostype$", os.type());
+                            sr2 = sr2.replace("$osrelease$", os.release());
+                            sr2 = sr2.replace("$localaddr$", parseHost(req));
+                            sr2 = sr2.replace("$localport$", req.connection.localPort);
+                            if(verboose == true) {
+                                verbooose(req, 416);
+                            }
+                            res.writeHead(416, {'Content-Type':'text/html', 'Content-Length': sr2.length, "Server":server});
+                            res.end(sr2);
+                            return;
+                        } else if(final_range > fs.statSync(webroot + pa1["dir"] + "/" + pa1["base"])["size"]) {
+                            var sr2 = fs.readFileSync("staticPages/416.html");
+                            sr2 = sr2.replace("$serverName$", server);
+                            sr2 = sr2.replace("$ostype$", os.type());
+                            sr2 = sr2.replace("$osrelease$", os.release());
+                            sr2 = sr2.replace("$localaddr$", parseHost(req));
+                            sr2 = sr2.replace("$localport$", req.connection.localPort);
+                            if(verboose == true) {
+                                verbooose(req, 416);
+                            }
+                            res.writeHead(416, {'Content-Type':'text/html', 'Content-Length': sr2.length, "Server":server});
+                            res.end(sr2);
+                            return;
+                        }
+                        if(verboose == true) {
+                            verbooose(req, 206);
+                        }
                         res.writeHead(206, {'Content-Type':mimexd, "Accept-Ranges": "bytes", "Content-Range":"bytes=" + start_range + "-" + final_range + "/" + fs.statSync(webroot + pa1["dir"] + "/" + pa1["base"])["size"], "Content-Length": cl, "Server":server});
                         fs.createReadStream(webroot + pa1["dir"] + "/" + pa1["base"], {start: start_range, end: final_range}).pipe(res);
                     } else {
@@ -228,9 +282,6 @@ http.createServer(function(req, res){
                 }
                 if(pa1["base"] < 1) {
                     if(req.headers["range"]) {
-                        if(verboose == true) {
-                            verbooose(req, 206);
-                        }
                         var ran_st1 = req.headers["range"].split("-");
                         if(ran_st1[0] == "") {
                             var start_range = parseInt(ran_st1[1]);
@@ -247,6 +298,36 @@ http.createServer(function(req, res){
                             var final_range = parseInt(ran_st1[1]);
                         }
                         var cl = final_range - start_range + 1;
+                        if(start_range > fs.statSync(webroot + pa1["dir"] + pa1["base"])["size"]) {
+                            var sr2 = fs.readFileSync("staticPages/416.html");
+                            sr2 = sr2.replace("$serverName$", server);
+                            sr2 = sr2.replace("$ostype$", os.type());
+                            sr2 = sr2.replace("$osrelease$", os.release());
+                            sr2 = sr2.replace("$localaddr$", parseHost(req));
+                            sr2 = sr2.replace("$localport$", req.connection.localPort);
+                            if(verboose == true) {
+                                verbooose(req, 416);
+                            }
+                            res.writeHead(416, {'Content-Type':'text/html', 'Content-Length': sr2.length, "Server":server});
+                            res.end(sr2);
+                            return;
+                        } else if(final_range > fs.statSync(webroot + pa1["dir"] + pa1["base"])["size"]) {
+                            var sr2 = fs.readFileSync("staticPages/416.html");
+                            sr2 = sr2.replace("$serverName$", server);
+                            sr2 = sr2.replace("$ostype$", os.type());
+                            sr2 = sr2.replace("$osrelease$", os.release());
+                            sr2 = sr2.replace("$localaddr$", parseHost(req));
+                            sr2 = sr2.replace("$localport$", req.connection.localPort);
+                            if(verboose == true) {
+                                verbooose(req, 416);
+                            }
+                            res.writeHead(416, {'Content-Type':'text/html', 'Content-Length': sr2.length, "Server":server});
+                            res.end(sr2);
+                            return;
+                        }
+                        if(verboose == true) {
+                            verbooose(req, 206);
+                        }
                         res.writeHead(206, {'Content-Type':mimexd, "Accept-Ranges": "bytes", "Content-Range":"bytes=" + start_range + "-" + final_range + "/" + fs.statSync(webroot + pa1["dir"] + pa1["base"])["size"], "Content-Length": cl, "Server":server});
                         fs.createReadStream(webroot + pa1["dir"] + pa1["base"], {start: start_range, end: final_range}).pipe(res);
                     } else {
@@ -258,9 +339,6 @@ http.createServer(function(req, res){
                     }
                 } else {
                     if(req.headers["range"]) {
-                        if(verboose == true) {
-                            verbooose(req, 206);
-                        }
                         var ran_st1 = req.headers["range"].split("-");
                         if(ran_st1[0] == "") {
                             var start_range = parseInt(ran_st1[1]);
@@ -277,6 +355,36 @@ http.createServer(function(req, res){
                             var final_range = parseInt(ran_st1[1]);
                         }
                         var cl = final_range - start_range + 1;
+                        if(start_range > fs.statSync(webroot + pa1["dir"] + "/" + pa1["base"])["size"]) {
+                            var sr2 = fs.readFileSync("staticPages/416.html");
+                            sr2 = sr2.replace("$serverName$", server);
+                            sr2 = sr2.replace("$ostype$", os.type());
+                            sr2 = sr2.replace("$osrelease$", os.release());
+                            sr2 = sr2.replace("$localaddr$", parseHost(req));
+                            sr2 = sr2.replace("$localport$", req.connection.localPort);
+                            if(verboose == true) {
+                                verbooose(req, 416);
+                            }
+                            res.writeHead(416, {'Content-Type':'text/html', 'Content-Length': sr2.length, "Server":server});
+                            res.end(sr2);
+                            return;
+                        } else if(final_range > fs.statSync(webroot + pa1["dir"] + "/" + pa1["base"])["size"]) {
+                            var sr2 = fs.readFileSync("staticPages/416.html");
+                            sr2 = sr2.replace("$serverName$", server);
+                            sr2 = sr2.replace("$ostype$", os.type());
+                            sr2 = sr2.replace("$osrelease$", os.release());
+                            sr2 = sr2.replace("$localaddr$", parseHost(req));
+                            sr2 = sr2.replace("$localport$", req.connection.localPort);
+                            if(verboose == true) {
+                                verbooose(req, 416);
+                            }
+                            res.writeHead(416, {'Content-Type':'text/html', 'Content-Length': sr2.length, "Server":server});
+                            res.end(sr2);
+                            return;
+                        }
+                        if(verboose == true) {
+                            verbooose(req, 206);
+                        }
                         res.writeHead(206, {'Content-Type':mimexd, "Accept-Ranges": "bytes", "Content-Range":"bytes=" + start_range + "-" + final_range + "/" + fs.statSync(webroot + pa1["dir"] + "/" + pa1["base"])["size"], "Content-Length": cl, "Server":server});
                         fs.createReadStream(webroot + pa1["dir"] + "/" + pa1["base"], {start: start_range, end: final_range}).pipe(res);
                     } else {
