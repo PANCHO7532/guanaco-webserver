@@ -4,7 +4,8 @@
 ### Features
 1) Webserver :o
 2) Delivers any type of common media
-3) ???
+3) You can pause downloads and resume it later
+4) ???
 
 ### Install
 1) Download this repo by clicking "Download ZIP" or click [here](https://github.com/PANCHO7532/guanaco-webserver/archive/master.zip)
@@ -17,14 +18,16 @@
 
 ### Bugs
 1) Parent directory actually goes to root instead of previous folder
+2) Range header may crash the server due to lack of error handling
 
 ### TO-DO
 1) Virtual Servers
-2) ???
+2) .jscx
 
 ### Third-Party software/code
 - This webserver contains a file called "mimes.json" extracted from [snekfetch](https://github.com/devsnek/snekfetch)
 
 ### License
-See LICENSE file for more details, you may not use modify defualt assets in /data/visualRes
+See LICENSE file for more details, you may not be allowed to modify defualt assets in /data/visualRes
+
 Copyright PANCHO7532 - P7COMunications LLC
