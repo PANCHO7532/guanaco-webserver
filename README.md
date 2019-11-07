@@ -19,6 +19,7 @@
 ### Bugs
 1) Parent directory actually goes to root instead of previous folder
 2) Range header may crash the server due to lack of error handling
+3) Media streaming returns an 239 byte content in Chromium based browsers (Chrome, Opera, etc)
 
 ### TO-DO
 1) Virtual Servers
