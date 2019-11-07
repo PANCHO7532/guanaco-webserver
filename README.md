@@ -11,6 +11,7 @@
 1) Download this repo by clicking "Download ZIP" or click [here](https://github.com/PANCHO7532/guanaco-webserver/archive/master.zip)
 2) Decompress in an empty folder
 3) Modify mainPort variable in index.js with the listen port of your choice
+
 3a) If do you want, modify webroot directory with the actual folder that you want to use for store your webcontent
 4) Put some content in public_html
 5) Open an console in the folder and write "node index.js"
