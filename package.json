@@ -1,6 +1,6 @@
 {
   "name": "guanaco_webserver",
-  "version": "1.7.2",
+  "version": "1.7.4",
   "description": "Simple Webserver maded in Node.JS",
   "main": "index.js",
   "scripts": {
