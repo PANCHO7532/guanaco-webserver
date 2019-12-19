@@ -22,6 +22,7 @@
 1) Parent directory actually goes to root instead of previous folder
 2) Range header may crash the server due to lack of error handling
 3) Media streaming returns an 239 byte content in Chromium based browsers (Chrome, Opera, etc) this surprisingly doesn't affect Firefox
+4) CRITICAL: Path Traversal vulnerability detected! Don't use until an fix is released.
 
 ### TO-DO
 1) Virtual Servers
