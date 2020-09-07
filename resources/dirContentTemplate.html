@@ -1,0 +1,11 @@
+<!--
+    dirContentTemplate for GuanacoWebserver
+    Valid tags:
+    imageObject - Image for this table element
+    fileObject - Filename or directory name
+    modifiedDate - Last modified date as returned by fs.statSync
+    sizeValue - Size of the file or directory (4096 bytes in most cases for directories)
+    
+    Warnng, placeholder "start" must be there before the actual template content.
+-->
+[start]<tr><td>{imageObject}</td><td>{fileObject}</td><td>{modifiedDate}</td><td>{sizeValue}</td></tr>

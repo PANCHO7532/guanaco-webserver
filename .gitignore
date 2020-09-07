@@ -1,0 +1,8 @@
+graveyard/
+no_deploy/
+public_html/
+cfg/sslkey.pem
+cfg/sslcert.crt
+cfg/sslcert-prod.crt
+cfg/sslcert-local.crt
+package-lock.json

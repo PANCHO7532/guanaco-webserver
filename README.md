@@ -1,6 +1,8 @@
 # Guanaco Webserver
 ## An simple webserver maded with Node.JS
 
+### WARNING: This server is under reconstruction, some features described here may not work at this moment.
+
 ### Features
 1) Webserver :o
 2) Delivers any type of common media

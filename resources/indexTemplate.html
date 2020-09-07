@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html>
+    <!--
+        Index template page for Guanaco Webserver
+
+        Valid Tags:
+        currentDir, currentBodyDir - Actual dir, path requested.
+        dirContent - Parsed table content from dirContentTemplate.html
+        serverName - Server Version/Name
+        osType - Operating System type, ex: Windows, Linux, etc.
+        osRelease - Operating System release/basic kernel info
+        host - Public/Private hostname or Local Address/Interface address where the content was requested
+        localPort - Local Port where the content was requested (generally the main port of the server)
+    -->
+    <head>
+        <title>Index of {currentDir}</title>
+        <style>
+            table {
+                /*border: 1px solid black;*/
+                border: none;
+                text-align: left;
+            }
+        </style>
+    </head>
+    <body>
+        <h1>Index of {currentBodyDir}</h1>
+        <table class="a1">
+            <tr><th style="border: none"></th><th>Name</th><th>Last modified&#09</th><th>Size (in bytes)</th></tr>
+            <tr><td><img src="/rsrcfs/visualRes/back.png"></td><td><a href="..">Parent Directory</a></td></tr>
+            <!--
+                The following, is the theorized response in server side:
+                <tr><td>{imageObject}</td><td>{fileObject}</td><td>{modifiedDate}</td><td>{sizeValue}</td></tr>
+
+                It may fill up the table object above, with the dirContent tag below.
+                If you want to modify the dirContent tag response structure, locate dirContentTemplate.html and modify from there.
+            -->
+            {dirContent}          
+        </table>
+        <hr>
+        <address>{serverName} ({osType} {osRelease}) Server at {hostName} Port {localPort}</address>
+    </body>
+</html>

@@ -1,0 +1,25 @@
+<!DOCTYPE HTML>
+<html>
+    <!--
+        Error template page for Guanaco Webserver
+
+        Valid Tags:
+        errCode, errBodyCode - Error code requested by action, ex: 404
+        errCodeReason, errBodyCodeReason - Error reason specified, ex: "Not Found"
+        errDesc - Error description specified, if not present/attached at an Error Code it will throw an generic description.
+        serverName - Server Version/Name
+        osType - Operating System type, ex: Windows, Linux, etc.
+        osRelease - Operating System release/basic kernel info
+        hostName - Public/Private hostname or Local Address/Interface address where the content was requested
+        localPort - Local Port where the content was requested (generally the main port of the server)
+    -->
+    <head>
+        <title>{errCode} {errCodeReason}</title>
+    </head>
+    <body>
+        <h1>{errBodyCode} {errBodyCodeReason}</h1>
+        <p>{errDesc}</p>
+        <hr>
+        <address>{serverName} ({osType} {osRelease}) Server at {hostName} Port {localPort}</address>
+    </body>
+</html>

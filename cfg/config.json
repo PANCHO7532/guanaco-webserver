@@ -1,0 +1,5 @@
+{
+    "httpPort": 80,
+    "httpsPort": 443,
+    "webrootPath": "/public_html"
+}
